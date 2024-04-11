@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+    <link href="./dist/css/index.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="media/coda-logo.png">
+    <script type="module" src="component/index.js"></script>
+    <script type="module" src="component/Trans.js"></script>
+    <script  type="text/javascript" src="dist/trans.js"></script>
+    <script type="module" src="component/ChangeLanguage.js"></script>
+</head>
+<body class="container">
+<change-language-component></change-language-component>
+<a class="normalButton"
+   style="display: flex;align-items:center;margin-top: 1.2rem;margin-left: 0.5rem;border: 1px solid var(--base-green);border-radius: 50%;width: min-content;"
+   href="index.html">
+    <img style="padding: 0.8rem;" width="22" height="22" src="media/Back.svg" alt="back">
+</a>
+<h3 style="text-align: center;font-weight: 600;margin-bottom: 2rem;"><trans-component text="Welcome back!"></trans-component></h3>
+<div id="errorMsg" style="display:none;text-align: center;color: red">
+    <trans-component text="Sorry, there is a problem with your login attempt."></trans-component>
+</div>
+
+<div id="select" style="margin-top: 2rem;" class="form-group">
+</div>
+<div class="form-group">
+    <account-component></account-component>
+</div>
+<div style="display: flex;margin-top: 2rem;">
+    <input id="code"
+           style="min-width: 0;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.8rem 1rem;"/>
+    <button disabled
+            style="white-space:nowrap;margin-left: 1rem;display: flex;align-items: center;border-radius:0.5rem;background-color: #9B9C9C;color: white;font-size: 1.2rem;padding: 0.6rem 1rem;border: 0;"
+            id="getCode">
+        <img id="code-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
+             src="media/Rolling.svg"/>
+        <span id="buttonText">
+            <trans-component text="Get the code"></trans-component>
+        </span>
+    </button>
+</div>
+<div style="width: 100%;display: flex;justify-content: center;margin-top: 4rem">
+    <button disabled
+            style="display: flex;align-items: center;border-radius:0.5rem;background-color: #9B9C9C;color: white;font-size: 1.5rem;padding: 0.6rem 3.5rem;border: 0;"
+            id="submitBtn">
+        <img id="login-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
+             src="media/Rolling.svg"/>
+        <trans-component text="Log in"></trans-component>
+    </button>
+</div>
+<script>
+    let form_json = {};
+    let count = 0;
+    let code = "";
+    const submitBtn = document.getElementById('submitBtn');
+    const getCode = document.getElementById('getCode');
+    const loginRolling = document.getElementById('login-rolling');
+    const roleSelector = document.createElement('select-component');
+    const accountInputer = document.querySelector('account-component');
+    const codeInputer = document.getElementById('code');
+    const em = document.getElementById("errorMsg");
+
+    codeInputer.oninput = (e)=>{
+        code = e.target.value;
+        checkValidity();
+    };
+    accountInputer.changeCallBack = checkValidity;
+
+    const codeRolling = document.getElementById('code-rolling');
+    const buttonText = document.getElementById('buttonText');
+
+    roleSelector.list = [{value: "0", name: "Beneficiary"}, {value: "1", name: "Merchant"}]
+    roleSelector.defaultValue = {value: "0", name: "Beneficiary"}
+    document.getElementById("select").appendChild(roleSelector);
+
+    function openGetCode() {
+        getCode.style.backgroundColor = 'var(--base-green)';
+        getCode.className = 'clickButton';
+        getCode.style.cursor = 'pointer';
+        getCode.addEventListener('click', getCodeFunc);
+        getCode.disabled = false;
+    }
+
+    function closeGetCode() {
+        getCode.style.backgroundColor = '#9B9C9C';
+        getCode.className = '';
+        getCode.style.cursor = 'not-allowed';
+        getCode.removeEventListener('click', getCodeFunc);
+        getCode.disabled = true;
+    }
+
+    function openLogin() {
+        submitBtn.style.backgroundColor = 'var(--base-green)';
+        submitBtn.className = 'clickButton';
+        submitBtn.style.cursor = 'pointer';
+        submitBtn.addEventListener('click', login);
+        submitBtn.disabled = false;
+    }
+
+    function closeLogin() {
+        submitBtn.style.backgroundColor = '#9B9C9C';
+        submitBtn.className = '';
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.removeEventListener('click', login);
+        submitBtn.disabled = true;
+    }
+
+    const closeAll = (withWho) => {
+        if (withWho === "code") {
+            closeGetCode()
+        } else if (withWho === "login") {
+            closeGetCode()
+            closeLogin()
+        }
+    }
+
+    function moha() {
+        if (count > 0) {
+            setTimeout(() => {
+                count -= 1;
+                if (count) {
+                    buttonText.innerText = count + " " + t("second" + (count > 1 ? "s" : ""))
+                } else {
+                    buttonText.innerText = t("Get the code")
+                    openGetCode()
+                }
+                console.log(count)
+                moha(count)
+            }, 1000)
+        }
+    }
+
+    function countdown() {
+        count = 60;
+        buttonText.innerText = "60 "+ t("seconds");
+        closeGetCode()
+        moha();
+    }
+
+    function checkValidity() {
+        if (roleSelector.value && accountInputer.check) {
+            if (count === 0) {
+                openGetCode();
+            }
+            if (codeInputer.value) {
+                openLogin();
+            } else {
+                closeLogin();
+            }
+        } else {
+            closeGetCode();
+            closeLogin();
+        }
+    }
+
+    function login() {
+        loginRolling.style.display = "block";
+        closeLogin();
+        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/login/' + code, {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(function (response) {
+            loginRolling.style.display = "none";
+            return response.json();
+        }).then(function (data) {
+            if (data['status']) {
+                window.location.replace("home.html");
+                localStorage.setItem("IsLogin", "true");
+            } else {
+                console.error('Error:', error);
+                em.innerText = data['message'];
+                em.style.display = "block";
+                openLogin();
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            em.innerText = "Sorry, there is a problem with your login attempt.(error type: " + error + ")";
+            em.style.display = "block";
+            openLogin();
+        });
+    }
+
+    function getCodeFunc() {
+        closeGetCode();
+        codeRolling.style.display = "block";
+        form_json.role = roleSelector.value.value;
+        Object.assign(form_json, accountInputer.value);
+        sendQuery();
+    }
+
+    function sendQuery() {
+        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/login_phone', {
+            method: 'POST',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(form_json),
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            codeRolling.style.display = "none";
+            if (data['status']) {
+                em.innerText = "";
+                em.style.display = "none";
+                countdown();
+            } else {
+                em.innerText = data['message'];
+                em.style.display = "block";
+                openGetCode();
+            }
+        }).catch(error => {
+            codeRolling.style.display = "none";
+            console.error('Error:', error);
+            em.innerText = "Sorry, there is a problem with your login attempt.(error type: " + error + ")"
+            em.style.display = "block";
+            openGetCode();
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>donor dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./dist/css/index.css" rel="stylesheet">
+    <link href="./dist/css/bootstrap.min.css" rel="stylesheet">
+    <script type="module" src="component/CollapseLabel.js"></script>
+    <link rel="icon" type="image/png" href="media/coda-logo.png">
+    <script type="module" src="component/Trans.js"></script>
+    <script type="text/javascript" src="dist/trans.js"></script>
+    <script type="module" src="component/ChangeLanguage.js"></script>
+    <style>
+        .rotated-img {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+<change-language-component></change-language-component>
+<div style="margin-top: 10rem;height: 100%;text-align: center;display: none;" id="loading">
+    <trans-component text="Getting data"></trans-component>
+    ...
+</div>
+<div style="display: none;" id="body">
+    <div style="background-color: white;margin-top: 0.75rem;padding: 2rem 1.5rem;">
+        <div style="display: flex;flex-direction: column;align-items: center" class="jumbotron">
+            <img width="96" src="media/coda-logo.png">
+            <h1 id="title" style="font-size: 1.3rem;font-weight: 600;text-align: center;margin: 1.5rem 0 2rem"
+                class="display-4">
+                <trans-component text="Welcome"></trans-component>
+                !
+            </h1>
+            <div>
+                <trans-component text="Last updated"></trans-component>
+                <span id="now"></span></div>
+            <div style="width: 100%;">
+                <div style="box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);margin-bottom: 2.5rem;color: white;border:1px solid var(--base-green);background-color: var(--base-green);padding: 1rem 2rem;border-radius: 0.4rem;width: 100%">
+                    <div style="font-size: 1.3rem">
+                        <trans-component text="Redeemed / Donated"></trans-component>
+                    </div>
+                    <div style="font-size: 2.1rem;font-weight: 600;margin-top: 2rem">$<span
+                            id="redeemed-donated">0</span> / $50k
+                    </div>
+                </div>
+                <div style="box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);margin-bottom: 2.5rem;border:1px solid var(--base-green);color:var(--base-green);padding: 1rem 2rem;border-radius: 0.4rem;width: 100%">
+                    <div style="font-size: 1.3rem">
+                        <trans-component text="Families Helped"></trans-component>
+                    </div>
+                    <div style="font-size: 2.1rem;font-weight: 600;margin-top: 2rem"><span id="families-helped">0</span>
+                    </div>
+                </div>
+                <div style="box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);color: white;border:1px solid var(--base-green);background-color: var(--base-green);padding: 1rem 2rem;border-radius: 0.4rem;width: 100%">
+                    <div style="font-size: 1.3rem">
+                        <trans-component text="Meal served"></trans-component>
+                    </div>
+                    <div style="font-size: 2.1rem;font-weight: 600;margin-top: 2rem"><span id="meal-served">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="border: 1px solid var(--base-green);padding: 1.8rem 1.5rem;margin: 1.75rem 1.5rem 0;border-radius: 0.4rem">
+        <h1 style="font-size: 1.3rem;font-weight: 700;text-align: center;">
+            <trans-component text="Help Center"></trans-component>
+        </h1>
+        <div style="margin-top: 3rem;">
+            <collapse-component style="margin-top: 1.5rem;" name="Restaurant Information">
+                <div>Dignity Kitchen HK</div>
+                <br/>
+                <trans-component text="Address: 2/F, 618 Shanghai Street, Mongkok, Kowloon, HK."></trans-component>
+                <br/>
+                <trans-component
+                        text="Opening Hours: Monday - Saturday, Public Holidays & Public Holiday Eve: 11:00am - 8:00pm (Last order: 7:30pm)"></trans-component>
+                <br/>
+                <trans-component text="Sunday: 11:00 am - 5:00pm (Last order: 4:30pm)"></trans-component>
+            </collapse-component>
+            <collapse-component style="margin-top: 1.5rem;line-height: 1rem;" name="How it works">
+                <!--            <div>The Charity project is a PBM (Purpose Bound Money) application.</div>-->
+                <!--            <br/>-->
+                <!--            <div>Based on blockchain, the voucher claimed by the project can only be used for consuming meals at the specific Social Kitchen branch.</div>-->
+                <!--            <br/>-->
+                <!--            <div>Learn more here.</div>-->
+            </collapse-component>
+            <collapse-component style="margin-top: 1.5rem;" name="Technical support">
+                <!--            <div>Please add What's app account: xyxd for more help.</div>-->
+            </collapse-component>
+        </div>
+    </div>
+    <div style="text-align: center;font-size: 0.6rem;margin: 2rem 0">Powered by CODA Bridge</div>
+</div>
+</body>
+<script>
+    const loadingPlace = document.getElementById("loading");
+    const bodyPlace = document.getElementById("body");
+    let redeemedDonated = document.getElementById("redeemed-donated");
+
+    const formatNum = (num) => {
+        let text
+        if (num >= 1000000000) {
+            text = (num / 1000000000).toFixed(1) + 'b';
+
+        } else if (num >= 1000000) {
+            text = (num / 1000000).toFixed(1) + 'm';
+
+        } else if (num >= 1000) {
+            text = (num / 1000).toFixed(1) + 'k';
+
+        } else {
+            text = num;
+        }
+        return text;
+    }
+
+    // for dev
+    // bodyPlace.style.display = "block";
+
+    const getDonorData = async (next) => {
+        try {
+            if (!next) {
+                loadingPlace.style.display = "block";
+            }
+            let data = await fetch("https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/donor_report", {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({password: "CodaSK"}),
+            })
+            if (data.status === 200) {
+                data = await data.json()
+                let date = new Date();
+
+                document.getElementById("now").innerText = date.getDate() + ' ' +
+                    date.toLocaleString('en', {month: 'short'}) + ' ' +
+                    date.getHours() + ':' +
+                    (date.getMinutes() < 10 ? '0' : '') + date.getMinutes()
+                loadingPlace.style.display = "none";
+                bodyPlace.style.display = "block";
+                document.getElementById("meal-served").innerText = (data.payments || 0).toString()
+                document.getElementById("families-helped").innerText = (data.users || 0).toString()
+                const num = Math.round(parseFloat(data.amounts));
+                let text = formatNum(num)
+                redeemedDonated.title = (num || 0).toString()
+                redeemedDonated.innerText = (text || 0).toString()
+                setTimeout(() => {
+                    getDonorData(true)
+                }, 3000)
+            } else {
+                throw new Error('Query error!');
+            }
+        } catch (e) {
+            loadingPlace.style.display = "none";
+            setTimeout(() => {
+                getDonorData(true)
+            }, 1000)
+        }
+    }
+    getDonorData(false)
+</script>
+</html>

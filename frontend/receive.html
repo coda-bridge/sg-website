@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>receive</title>
+    <meta charset="UTF-8">
+    <link href="./dist/css/index.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="media/coda-logo.png">
+    <script type="text/javascript" src="dist/zxing.min.js"></script>
+    <script type="module" src="component/TransactionTab.js"></script>
+    <script type="module" src="component/Trans.js"></script>
+    <script type="text/javascript" src="dist/trans.js"></script>
+    <script type="module" src="component/ChangeLanguage.js"></script>
+    <script>
+        if (sessionStorage.getItem("IsLogin") !== "true") {
+            location.replace("index.html")
+        }
+    </script>
+</head>
+<body>
+<change-language-component></change-language-component>
+<img onclick="setUnMute()" id="mute-icon" style="position: absolute;cursor: pointer;top:1.35rem;right: 6rem;" width="22" height="22"
+     src="media/Mute.svg">
+<img onclick="setMute()" id="unmute-icon" style="position: absolute;cursor: pointer;top:1.35rem;right: 6rem;display: none;" width="22"
+     height="22" src="media/Unmute.svg">
+<div style="display: flex;justify-content: space-between;align-items: center;">
+    <a id="back-button" class="normalButton"
+       style="display: flex;align-items:center;margin-top: 1.2rem;margin-left: 0.5rem;border: 1px solid var(--base-green);border-radius: 50%;width: min-content;"
+       href="home.html">
+        <img style="padding: 0.8rem;" width="22" height="22" src="media/Back.svg" alt="back">
+    </a>
+</div>
+<div id="edit-amount"
+     style="background-color: white;padding: 0 1.5rem 2rem;display: none;flex-direction: column;align-items: center;">
+    <h1 style="font-size: 1.3rem;font-weight: 600;text-align: center;margin-top: 1.5rem" class="display-4">
+        <trans-component text="Edit the amount"></trans-component>
+    </h1>
+    <div style="margin: 2.9rem 0 2.5rem;text-align: center;">
+        <trans-component text="Input the amount you want to receive"></trans-component>
+    </div>
+    <input name="amount" id="amount-input" type="text" inputmode="decimal"
+           style="width: 75vw;padding: 0.8rem 1rem;border: 1px solid var(--base-green);font-size: 2.5rem;line-height: 3.75rem;"/>
+    <div id="confirm-button"
+         style="border-radius: 0.5rem;line-height:2.25rem;margin-top: 5rem;padding: 0.7rem 3.5rem;background-color: var(--base-green);color: white;font-size: 1.5rem;cursor: pointer;"
+         class="clickButton">
+        <trans-component text="Confirm"></trans-component>
+    </div>
+</div>
+<div id="receive"
+     style="background-color: white;padding: 0 1.5rem 2rem;display: flex;flex-direction: column;align-items: center;">
+    <h1 style="font-size: 1.3rem;font-weight: 600;text-align: center;margin-top: 1.5rem" class="display-4">
+        <trans-component text="Receive vouchers"></trans-component>
+    </h1>
+    <div id="result"
+         style="display: flex;justify-content:center;align-items: center;flex-direction: column;width:300px;min-height: 300px">
+        <img src="media/loading.gif">
+    </div>
+    <div style="display: flex;justify-content: space-around;width: 100%;margin-bottom: 3rem">
+        <div style="cursor: pointer;" class="clickText" id="open-edit">
+            <trans-component text="Edit the amount"></trans-component>
+        </div>
+        <div style="cursor: pointer;" class="clickText" onclick="downloadQRCode()" id="download">
+            <trans-component text="Download the QR code"></trans-component>
+        </div>
+    </div>
+    <div style="display: flex;justify-content: space-between;width: 100%;padding: 1rem 0">
+        <div>
+            <trans-component text="Voucher(s) received today"></trans-component>
+        </div>
+        <a class="clickText" href="transaction_history.html" style="margin-right: 1rem;text-decoration-line:none;">
+            <trans-component text="More"></trans-component>
+            ></a>
+    </div>
+    <div style="background-color: black;height: 1px;width: 100%"></div>
+    <div style="width: 100%;margin-top: 0.5rem" id="history-place">
+        <div style="display: flex;justify-content: center;margin-top: 2rem;">
+            <img width="100" src="media/loading.gif"/>
+        </div>
+    </div>
+    <div style="font-size: 0.9rem">
+        <div style="font-size: 1rem;margin: 4rem 0 1rem">
+            <trans-component text="Notes:"></trans-component>
+        </div>
+        <div>
+            <trans-component
+                    text="To be used only for vouchers for The Social Kitchen at its designated outlets only."></trans-component>
+        </div>
+    </div>
+    <div style="text-align: center;font-size: 0.6rem;margin: 4rem 0">Powered by CODA Bridge</div>
+</div>
+<audio id="money-audio"></audio>
+<script>
+    let kitchenName
+    let ethAddress
+
+    let transactionData
+
+    const historyPlace = document.getElementById("history-place");
+    const confirmButton = document.getElementById("confirm-button");
+    const amountInput = document.getElementById("amount-input");
+    const receivePlace = document.getElementById("receive");
+    const editPlace = document.getElementById("edit-amount");
+    const backButton = document.getElementById("back-button");
+    const moneyAudio = document.getElementById("money-audio");
+
+    const muteIcon = document.getElementById("mute-icon");
+    const unmuteIcon = document.getElementById("unmute-icon");
+    let isMute = true
+
+    const setUnMute = () => {
+        moneyAudio.play();
+        moneyAudio.src = "media/money.mp3"
+        const utterance = new SpeechSynthesisUtterance(``);
+        utterance.lang = 'en-US';
+        utterance.volume = 0;
+        speechSynthesis.speak(utterance);
+        isMute = false;
+        muteIcon.style.display = "none";
+        unmuteIcon.style.display = "block";
+    }
+
+    const setMute = () => {
+        isMute = true;
+        muteIcon.style.display = "block";
+        unmuteIcon.style.display = "none";
+    }
+
+    function downloadQRCode() {
+        const svg = document.getElementById("result").querySelector("svg");
+        const serializer = new XMLSerializer();
+        const svgData = serializer.serializeToString(svg);
+        const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = kitchenName + " $" + amountInput.value + " qrcode.svg";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    amountInput.addEventListener("input", () => {
+        let value = amountInput.value;
+        let prevCursorPos = amountInput.selectionStart || 0;
+        value = value.replace(/^0*(\d+)/, '$1');
+        value = value.replace(/[^\d.]/g, "");
+        if (value.indexOf('.') === 0) {
+            value = '0' + value;
+            prevCursorPos += 1;
+        }
+        if (value.indexOf('.') !== -1) {
+            const idx = value.indexOf('.') + 3;
+            amountInput.value = value.substring(0, idx)
+        } else {
+            amountInput.value = value
+        }
+        amountInput.setSelectionRange(prevCursorPos, prevCursorPos);
+    })
+
+    amountInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            saveAmount()
+        }
+    });
+
+    function closeEdit() {
+        receivePlace.style.display = "flex";
+        editPlace.style.display = "none";
+        backButton.removeAttribute("onclick");
+        setTimeout(() => {
+            backButton.href = "home.html";
+        }, 100);
+        generateQRCode()
+    }
+
+    function saveAmount() {
+        closeEdit()
+    }
+
+    confirmButton.addEventListener("click", saveAmount)
+
+    function openEdit(e) {
+        receivePlace.style.display = "none";
+        editPlace.style.display = "flex";
+        backButton.removeAttribute("href");
+        backButton.setAttribute('onclick', 'closeEdit()');
+        e.preventDefault()
+    }
+
+    document.getElementById("open-edit").addEventListener("click", openEdit)
+
+    function generateQRCode() {
+        const amount = amountInput.value
+        document.getElementById("result").innerHTML = ""
+        if (amount && amount !== "0.00") {
+            document.getElementById("result").innerHTML = `<div style="font-size: 4rem;color: var(--base-green);font-weight: 700;text-align: center;">${amount}</div>`
+        }
+        const codeWriter = new ZXing.BrowserQRCodeSvgWriter()
+        codeWriter.writeToDom('#result', encodeURI(`https://www.thecharityproject.xyz/pay.html?name=${kitchenName}&ethAddress=${ethAddress}&amount=${amount}`), 300, 300);
+    }
+
+    const getTransaction = async () => {
+        try {
+            const response = await fetch(`https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/merchant_transactions`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                }
+            )
+            const getData = await response.json();
+
+            const today = new Date();
+            const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+            const endOfToday = startOfToday + 24 * 60 * 60 * 1000 - 1;
+
+            let newTransactionData = getData.map(item => {
+                const serverTime = new Date(item.timestamp);
+                const offset = new Date().getTimezoneOffset();
+                item.timestamp = serverTime.getTime() - offset * 60 * 1000;
+                item.name = item.user_name + " (" + item.user_phone.slice(-4) + ")"
+                delete item.user_name
+                if (item.user_phone) {
+                    delete item.user_phone;
+                }
+                return item;
+            }).filter(item => {
+                const differentLength = 13 - item.timestamp.toString().length;
+                const timestamp = item.timestamp * Math.pow(10, differentLength);
+                return timestamp >= startOfToday && timestamp < endOfToday && item.amount > 0;
+            })
+            if (transactionData) {
+                const oldSet = new Set(transactionData.map(item => `${item.timestamp}_${item.user_phone}_${item.amount}`));
+                const newSet = new Set(newTransactionData.map(item => `${item.timestamp}_${item.user_phone}_${item.amount}`));
+
+                if (newSet.size > oldSet.size && !isMute) {
+                    moneyAudio.play();
+                    const newItems = new Set([...newSet].filter(x => !oldSet.has(x)));
+                    newItems.forEach((item) => {
+                        let amount = item.split("_")[2]
+                        amount = Math.round(parseFloat(amount) * 100) / 100;
+                        const utterance = new SpeechSynthesisUtterance(`You just received ${amount} dollar${amount > 0.5 ? "s" : ""}!`);
+                        utterance.lang = 'en-US';
+                        speechSynthesis.speak(utterance);
+                    })
+                }
+            }
+
+            historyPlace.innerHTML = ""
+            newTransactionData.forEach(item => {
+                const comp = document.createElement('transaction-component');
+                comp.name = item.name;
+                comp.role = 1;
+                comp.price = Math.round(parseFloat(item.amount) * 100) / 100;
+                comp.time = item.timestamp;
+                historyPlace.appendChild(comp);
+            });
+            transactionData = newTransactionData
+        } catch (error) {
+            console.error('Error:', error)
+        }
+        setTimeout(() => {
+            getTransaction(true)
+        }, 3000)
+    }
+
+    fetch("https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/profile", {
+        method: 'GET',
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+    }).then(async function (response) {
+        try {
+            const data = await response.json();
+            if (data["merchant_name"] && data["eth_address"] && data["role"] === 1) {
+                kitchenName = data["merchant_name"]
+                ethAddress = data["eth_address"]
+                generateQRCode()
+                getTransaction()
+            } else {
+                location.replace("home.html")
+            }
+        } catch (e) {
+            console.error('profileError:', e)
+            location.replace("index.html")
+        }
+    }).catch(error => {
+        console.error('networkError:', error)
+    });
+</script>
+</body>
+</html>

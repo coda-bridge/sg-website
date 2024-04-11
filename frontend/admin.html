@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./dist/css/index.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="media/coda-logo.png">
+    <script type="module" src="component/Trans.js"></script>
+    <script type="text/javascript" src="dist/trans.js"></script>
+    <script type="module" src="component/ChangeLanguage.js"></script>
+    <style>
+        #result table td, th {
+            padding: 0.8rem 0.6rem;
+            border: 1px solid #B9B9B9;
+        }
+    </style>
+</head>
+<body>
+<change-language-component></change-language-component>
+<div style="display: block;" id="body">
+    <div style="display: flex;flex-direction: column;align-items: center;justify-content:space-between;padding: 0 2rem;min-height: 100vh;">
+        <div style="margin-top: 5rem;display: flex;flex-direction: column;align-items: center;width:50rem;">
+            <img width="96" src="media/coda-logo.png">
+            <div style="font-size: 1.3rem;font-weight: 700;margin: 2rem 0;">
+                <trans-component text="Refill vouchers for beneficiaries"></trans-component>
+            </div>
+            <div id="drop_zone"
+                 class="clickButton"
+                 style="cursor: pointer;user-select: none;border-radius: 0.625rem;padding: 1.5rem 0;border: 1px solid var(--base-green);background-color: #FBFFFB;width: 100%;text-align: center;">
+                <trans-component text="Select file or drop here"></trans-component>
+                <br/>
+                <br/>
+                <trans-component text="Only .CSV accepted"></trans-component>
+            </div>
+            <input type="file" style="display: none;" id="file_input">
+            <div id="fileUpdate" style="width: 100%;display: none;justify-content: space-between;align-items: center;">
+                <img style="margin-right: 1rem;" src="media/Csv.svg">
+                <div style="flex:1;">
+                    <div style="display: flex;justify-content: space-between">
+                        <div id="fileName"></div>
+                        <div id="updatePercentNumber"></div>
+                    </div>
+                    <div style="margin-top:0.5rem;width: 100%;border: 1px solid var(--base-green);height: 1rem;border-radius: 0.5rem;">
+                        <div id="updatePprogress"
+                             style="width:0%;background-color:var(--base-green);height: 100%;border-radius: 0.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="alertConfirm"
+                 style="display: none;border-radius: 0.625rem;box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);padding: 1.5rem 2rem;border: 1px solid var(--base-green);background-color: #FBFFFB;width: 100%;text-align: center;">
+                <p id="alertText"></p>
+                <div>
+                    <trans-component
+                            text="Please enter the passwords and then confirm this operation"></trans-component>
+                </div>
+                <div style="position: relative;width: 100%;margin-top: 1rem;align-items: center;display: flex;">
+                    <input id="password" type="password"
+                           style="width: 100%;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.5rem 0.75rem"/>
+                    <img id="eye" style="width: 1.2rem;position: absolute;right:1rem;" src="./media/Eye.svg">
+                    <img id="closeEye" style="width: 1.2rem;position: absolute;right:1rem;display: none;"
+                         src="./media/CloseEye.svg">
+                </div>
+                <div id="warn" style="color: red;font-size: 0.8rem;margin-top: 0.5rem;display: none;">
+                    <trans-component text="incorrect password, please try again"></trans-component>
+                </div>
+            </div>
+            <div id="note" style="font-size: 1rem;margin-top: 3rem;">
+                <p style="font-weight: 600;">
+                    <trans-component text="Notes:"></trans-component>
+                </p>
+                <p>1.
+                    <trans-component
+                            text="Please upload a CSV file contains client's phone number and amount of the voucher."></trans-component>
+                    <a href="dist/Refill_Vouchers_Template.csv">
+                        <trans-component text="See a sample here"></trans-component>
+                    </a>.
+                </p>
+                <p>2.
+                    <trans-component text="You can only upload one file each time."></trans-component>
+                </p>
+                <p>3.
+                    <trans-component text="It may take several minutes to refill the vouchers."></trans-component>
+                </p>
+                <div>4.
+                    <trans-component
+                            text="The transaction will continue even if the account doesn't exist. Once the client registers an account, he/she will get the voucher at the same time."></trans-component>
+                </div>
+            </div>
+            <div id="result" style="display: none;width: 100%;">
+                <div style="color: red;font-size: 0.8rem;">
+                    <trans-component
+                            text="Please do not leave this page until all the beneficiaries are finished."></trans-component>
+                </div>
+                <table style="width: 100%;border-collapse: collapse;margin-top: 2rem;">
+                    <thead>
+                    <tr style="background-color: rgba(0,0,0,0.06);font-weight: 600;">
+                        <th>
+                            <trans-component text="No."></trans-component>
+                        </th>
+                        <th>
+                            <trans-component text="Country Code"></trans-component>
+                        </th>
+                        <th>
+                            <trans-component text="Phone Number"></trans-component>
+                        </th>
+                        <th>
+                            <trans-component text="Amount"></trans-component>
+                        </th>
+                        <th>
+                            <trans-component text="Status"></trans-component>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="resultTbody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="button" style="width:100%;margin-top: 3.5rem;display: none;justify-content: space-around;">
+                <div id="noButton" class="clickButton"
+                     style="border-radius: 10px;border:1px solid var(--base-green);padding: 0.65rem 2rem;">
+                    <trans-component text="Cancel"></trans-component>
+                </div>
+                <div id=" yesButton
+                    "
+                     class="clickButton"
+                     style="background-color: var(--base-green);color: white;border-radius: 10px;border:1px solid
+                    var(--base-green);padding: 0.65rem 2rem;">
+                    <trans-component text="Confirm"></trans-component>
+                </div>
+            </div>
+        </div>
+        <div style=" text-align: center;font-size: 0.6rem;margin: 2rem 0;">Powered by CODA Bridge</div>
+    </div>
+</div>
+</body>
+<script>
+    let passwordInput = document.getElementById("password");
+    let eyeIcon = document.getElementById("eye");
+    let closeEyeIcon = document.getElementById("closeEye");
+    let warnText = document.getElementById("warn");
+    let fileUpdatePlace = document.getElementById("fileUpdate");
+    let fileName = document.getElementById("fileName");
+    let updatePercentNumber = document.getElementById("updatePercentNumber");
+    let updatePprogress = document.getElementById("updatePprogress");
+    let alertConfirmPlace = document.getElementById("alertConfirm");
+    let notePlace = document.getElementById("note");
+    let buttonPlace = document.getElementById("button");
+    let yesButton = document.getElementById("yesButton");
+    let noButton = document.getElementById("noButton");
+    let resultPlace = document.getElementById("result");
+    let tBodyPlace = document.getElementById("resultTbody");
+
+    let fileData = []
+    let resultList = [];
+    let password
+
+    let dropZone = document.getElementById('drop_zone');
+    let fileInput = document.getElementById('file_input');
+
+    function alert_if_uploading(event) {
+        event.preventDefault();
+        event.returnValue = true;
+    }
+
+    dropZone.addEventListener("dragenter", (e) => {
+        e.preventDefault()
+        if (e.target.id === "drop_zone") {
+            e.target.style.border = "1px dashed #000";
+        }
+    })
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault()
+        if (e.target.id === "drop_zone") {
+            e.target.style.border = "1px dashed #000";
+        }
+    })
+    dropZone.addEventListener("dragleave", (e) => {
+        e.preventDefault()
+        if (e.target.id === "drop_zone") {
+            e.target.style.border = "1px solid var(--base-green)";
+        }
+    })
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.target.id === "drop_zone") {
+            checkFile(e.dataTransfer.files)
+        }
+    })
+    fileInput.addEventListener("change", (e) => {
+        checkFile(e.target.files)
+    })
+    dropZone.addEventListener('click', () => {
+        fileInput.value = ""
+        fileInput.click()
+    })
+
+    const backToDropFile = () => {
+        dropZone.style.display = "block";
+        dropZone.style.border = "1px solid var(--base-green)";
+        notePlace.style.display = "block";
+        buttonPlace.style.display = "none";
+        fileUpdatePlace.style.display = "none";
+        alertConfirmPlace.style.display = "none";
+        resultPlace.style.display = "none";
+    }
+
+    const checkFile = (files) => {
+        const filesLength = files.length
+        if (filesLength < 1) {
+            alert("You need to upload a file!")
+        } else if (files[0].type !== "text/csv") {
+            alert("You can only upload .csv files!")
+        } else if (filesLength > 1) {
+            alert("Only one file can be uploaded at a time!")
+        } else {
+            fileName.innerText = files[0].name
+            fileUpdatePlace.style.display = "flex";
+            buttonPlace.style.display = "flex";
+            noButton.innerText = "Cancel";
+            noButton.setAttribute('onclick', "backToDropFile()");
+            yesButton.innerText = "Save";
+            fileData = []
+            yesButton.setAttribute('onclick', "");
+            yesButton.style.color = "black";
+            yesButton.style.backgroundColor = "#929292";
+            yesButton.style.border = "1px solid #929292";
+            dropZone.style.display = "none";
+            notePlace.style.display = "none";
+            uploadFiles(files[0]);
+        }
+    }
+
+    const goConfirm = (countAmount) => {
+        fileUpdatePlace.style.display = "none";
+        alertConfirmPlace.style.display = "block";
+        alertConfirmPlace.getElementsByTagName("p")[0].innerText = `We will send $${countAmount} vouchers.`;
+        yesButton.style.display = "flex";
+        yesButton.innerHTML = `<img id="confirm-rolling"
+                                                style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
+                                                src="media/Rolling.svg"/>Confirm`;
+        yesButton.style.color = "black";
+        yesButton.style.backgroundColor = "#929292";
+        yesButton.style.border = "1px solid #929292";
+        yesButton.setAttribute('onclick', "");
+    }
+
+    const startRefill = async () => {
+        const rolling = document.getElementById("confirm-rolling")
+        rolling.style.display = "block";
+        window.addEventListener("beforeunload", alert_if_uploading);
+        let fetchStatus = true
+        tBodyPlace.innerHTML = fileData.map((data, index) => {
+            return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${data["country_code"]}</td>
+                        <td>${data["phone_number"]}</td>
+                        <td>${data["amount"]}</td>
+                        <td id="resultTr${index}status">Queue</td>
+                    </tr>
+                    `;
+        }).join("")
+        const setDone = (i) => {
+            resultList.push({...fileData[i], status: "Done"})
+            document.getElementById("resultTr" + i + "status").innerText = "Done"
+        }
+        const setError = (i) => {
+            resultList.push({...fileData[i], status: "Error"})
+            document.getElementById("resultTr" + i + "status").innerText = "Error"
+        }
+        for (let i = 0; i < fileData.length; i++) {
+            document.getElementById("resultTr" + i + "status").innerText = "In process"
+            try {
+                const query = await
+                    fetch("https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/add_fund", {
+                        method: 'POST',
+                        credentials: "include",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            password,
+                            amount: parseFloat(fileData[i]["amount"]),
+                            phone_country: fileData[i]["country_code"].replace("+", ""),
+                            phone_number: fileData[i]["phone_number"]
+                        })
+                    })
+                if (query.status === 200) {
+                    resultPlace.style.display = "block";
+                    buttonPlace.style.display = "none";
+                    alertConfirmPlace.style.display = "none";
+                    const req = await query.json()
+                    if (req.status) {
+                        setDone(i);
+                    } else {
+                        setError(i);
+                    }
+                } else if (i === 0 && query.status === 401) {
+                    warnText.style.display = "block";
+                    fetchStatus = false
+                    break;
+                } else {
+                    resultPlace.style.display = "block";
+                    buttonPlace.style.display = "none";
+                    alertConfirmPlace.style.display = "none";
+                    setError(i);
+                }
+            } catch (e) {
+                console.log(e);
+                resultPlace.style.display = "block";
+                buttonPlace.style.display = "none";
+                alertConfirmPlace.style.display = "none";
+                setError(i);
+            }
+        }
+        rolling.style.display = "none";
+        passwordInput.value = ""
+        if (fetchStatus) {
+            buttonPlace.style.display = "flex"
+            noButton.innerText = "Back to home";
+            noButton.setAttribute('onclick', "backToDropFile()");
+            yesButton.innerText = "Save the refill records";
+            yesButton.style.color = "white";
+            yesButton.style.backgroundColor = "var(--base-green)";
+            yesButton.style.border = "1px solid var(--base-green)";
+            yesButton.setAttribute('onclick', `exportCsv()`);
+        }
+        window.removeEventListener("beforeunload", alert_if_uploading);
+    }
+    const exportCsv = () => {
+        const headers = Object.keys(resultList[0]);
+        const arrayToCsv = (data) => [
+            headers.join(','),
+            ...data.map(row =>
+                headers.map(header => row[header]).join(',')
+            )
+        ].join('\n')
+        const csv = arrayToCsv(resultList);
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        const blob = new Blob(["\ufeff" + csv], {type: 'text/csv;charset=utf-8;'});
+        link.href = URL.createObjectURL(blob);
+        const now = new Date();
+        const filename = now.getFullYear() + '-'
+            + (now.getMonth() + 1) + '-'
+            + now.getDate() + ' '
+            + now.getHours() + '-'
+            + now.getMinutes() + '-'
+            + now.getSeconds();
+
+        link.download = filename + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function uploadFiles(file) {
+        let reader = new FileReader()
+        reader.readAsText(file)
+        reader.onload = e => {
+            const csv = e.target.result
+            const rows = csv.replace(/\r/g, '').split('\n');
+
+            const headers = rows[0].split(',');
+
+            const amountIndex = headers.indexOf('amount');
+            const phoneCountryIndex = headers.indexOf('country_code');
+            const phoneNumberIndex = headers.indexOf('phone_number');
+
+            const data = rows.slice(1);
+            let countAmount = 0
+            data.forEach(row => {
+                if (row) {
+                    const cols = row.split(',');
+                    if (cols[amountIndex] && parseFloat(cols[amountIndex])) {
+                        countAmount += parseFloat(cols[amountIndex])
+                    }
+                    fileData.push({
+                        amount: cols[amountIndex],
+                        country_code: cols[phoneCountryIndex],
+                        phone_number: cols[phoneNumberIndex]
+                    });
+                }
+            });
+            yesButton.style.color = "white";
+            yesButton.style.backgroundColor = "var(--base-green)";
+            yesButton.style.border = "1px solid var(--base-green)";
+            yesButton.setAttribute('onclick', `goConfirm(${countAmount})`);
+        }
+
+        reader.onerror = () => {
+
+        }
+
+        reader.onprogress = event => {
+            const percent = (event.loaded / event.total * 100) + "%"
+            updatePprogress.style.width = percent
+            updatePercentNumber.innerText = percent
+        }
+    }
+
+    passwordInput.addEventListener("input", () => {
+        password = passwordInput.value
+        warnText.style.display = "none";
+        if (passwordInput.value.trim().length > 0) {
+            yesButton.style.color = "white";
+            yesButton.style.backgroundColor = "var(--base-green)";
+            yesButton.style.border = "1px solid var(--base-green)";
+            yesButton.setAttribute('onclick', `startRefill()`);
+        } else {
+            yesButton.style.color = "black";
+            yesButton.style.backgroundColor = "#929292";
+            yesButton.style.border = "1px solid #929292";
+            yesButton.setAttribute('onclick', "");
+
+        }
+    })
+
+    const open = () => {
+        passwordInput.type = "text";
+        eyeIcon.style.display = "none";
+        closeEyeIcon.style.display = "block";
+    }
+
+    const close = () => {
+        passwordInput.type = "password";
+        eyeIcon.style.display = "block";
+        closeEyeIcon.style.display = "none";
+    }
+
+    eyeIcon.addEventListener("click", open)
+    closeEyeIcon.addEventListener("click", close)
+</script>
+</html>
