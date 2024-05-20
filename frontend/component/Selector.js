@@ -60,31 +60,6 @@ class Selector extends HTMLElement {
             composed: true
         }));
 
-        function transDate(dateText, locales) {
-            const month = new Date(dateText).toLocaleString(locales, {month: 'short'});
-            const year = new Date(dateText).getFullYear();
-            return month + " " + year;
-        }
-
-
-
-        function transText(e) {
-            const language = e ? e.setValue.value : localStorage.getItem("codaLanguage")
-            selectOptionList.querySelectorAll("div").forEach(item => {
-                if (that.type === "time") {
-                    if (item.id === roleInput.value) {
-                        select.innerText = transDate(item.name, language === "en" ? "en-US" : "zh-HK");
-                    }
-                    item.innerText = transDate(item.name, language === "en" ? "en-US" : "zh-HK");
-                } else {
-                    if (item.id === roleInput.value) {
-                        select.innerText = t(item.name);
-                    }
-                    item.innerText = t(item.name);
-                }
-            })
-        }
-
         if (this.list) {
             this.list.forEach(value => {
                 const valueItem = document.createElement('div');
@@ -97,24 +72,19 @@ class Selector extends HTMLElement {
                 if (typeof value === "object") {
                     valueItem.id = value.value.toString();
                     valueItem.name = value.name.toString();
-                    valueItem.innerText = t(value.name.toString());
+                    valueItem.innerText = value.name.toString();
                 } else {
                     valueItem.id = value.toString();
                     valueItem.name = value.toString();
-                    valueItem.innerText = t(value.toString());
+                    valueItem.innerText = value.toString();
                 }
                 selectOptionList.appendChild(valueItem)
                 if (this.defaultValue) {
                     setValue(this.defaultValue)
                 }
             })
-            transText();
             syncWidth();
         }
-
-        window.addEventListener('setLanguage', (e)=>{
-            transText(e)
-        });
 
         if (!this.type || this.type === "normal") {
             roleSelect.className = "normal-body"
@@ -164,19 +134,17 @@ class Selector extends HTMLElement {
         })
 
         function setValue(value) {
-            let thisCheckValue
             select.style.color = "black"
             if (typeof value === "string") {
-                select.innerText = t(value)
-                thisCheckValue = value
-            } else {
-                select.innerText = t(value.name)
-                thisCheckValue = value.value
+                select.innerText = value
+                roleInput.value = value
+            }else {
+                select.innerText = value.name
+                roleInput.value = value.value
             }
-            roleInput.value = thisCheckValue
             const divs = selectOptionList.querySelectorAll('div');
             divs.forEach(div => {
-                if (div.id !== thisCheckValue) {
+                if (div.id !== value) {
                     div.style.backgroundColor = "white";
                 } else {
                     div.style.backgroundColor = "rgba(73,176,93,0.5)";
@@ -209,10 +177,6 @@ class Selector extends HTMLElement {
 
         syncWidth();
         window.addEventListener('resize', syncWidth);
-    }
-
-    setDisabled(boolean) {
-        // this.shadowRoot.getElementById('phone_number').disabled = boolean;
     }
 }
 

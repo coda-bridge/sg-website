@@ -7,18 +7,16 @@
     <link href="./dist/css/index.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="media/coda-logo.png">
     <script type="module" src="component/index.js"></script>
-    <script type="module" src="component/Trans.js"></script>
-    <script  type="text/javascript" src="dist/trans.js"></script>
-    <script type="module" src="component/ChangeLanguage.js"></script>
 </head>
 <body class="container">
-<change-language-component></change-language-component>
 <a class="normalButton"
    style="display: flex;align-items:center;margin-top: 1.2rem;margin-left: 0.5rem;border: 1px solid var(--base-green);border-radius: 50%;width: min-content;"
    href="index.html">
     <img style="padding: 0.8rem;" width="22" height="22" src="media/Back.svg" alt="back">
 </a>
-<h3 style="text-align: center;font-weight: 600;margin-bottom: 2rem;"><trans-component text="Welcome back!"></trans-component></h3>
+<h3 style="text-align: center;font-weight: 600;margin-bottom: 2rem;">
+    <trans-component text="Welcome back!"></trans-component>
+</h3>
 <div id="errorMsg" style="display:none;text-align: center;color: red">
     <trans-component text="Sorry, there is a problem with your login attempt."></trans-component>
 </div>
@@ -29,7 +27,7 @@
     <account-component></account-component>
 </div>
 <div style="display: flex;margin-top: 2rem;">
-    <input id="code"
+    <input autocomplete="one-time-code" inputmode="numeric" id="code"
            style="min-width: 0;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.8rem 1rem;"/>
     <button disabled
             style="white-space:nowrap;margin-left: 1rem;display: flex;align-items: center;border-radius:0.5rem;background-color: #9B9C9C;color: white;font-size: 1.2rem;padding: 0.6rem 1rem;border: 0;"
@@ -40,6 +38,16 @@
             <trans-component text="Get the code"></trans-component>
         </span>
     </button>
+</div>
+<div id="getCodeNote" style="display: none;margin-top: 1rem;font-size: 0.8rem;line-height: 1rem;">
+    <div>
+        <trans-component
+                text="We sent a verification code to your WhatsApp. Please check your WhatsApp messages and enter the 6-digit code."></trans-component>
+    </div>
+    <div style="margin-top: 0.5rem;">
+        <trans-component
+                text="Didn't receive the code? You can request to resend it after one minute."></trans-component>
+    </div>
 </div>
 <div style="width: 100%;display: flex;justify-content: center;margin-top: 4rem">
     <button disabled
@@ -60,9 +68,10 @@
     const roleSelector = document.createElement('select-component');
     const accountInputer = document.querySelector('account-component');
     const codeInputer = document.getElementById('code');
+    const getCodeNote = document.getElementById("getCodeNote");
     const em = document.getElementById("errorMsg");
 
-    codeInputer.oninput = (e)=>{
+    codeInputer.oninput = (e) => {
         code = e.target.value;
         checkValidity();
     };
@@ -76,6 +85,8 @@
     document.getElementById("select").appendChild(roleSelector);
 
     function openGetCode() {
+        count = 0;
+        clearTimeout(timerId);
         getCode.style.backgroundColor = 'var(--base-green)';
         getCode.className = 'clickButton';
         getCode.style.cursor = 'pointer';
@@ -116,14 +127,16 @@
         }
     }
 
+    let timerId;
+
     function moha() {
         if (count > 0) {
-            setTimeout(() => {
+            timerId = setTimeout(() => {
                 count -= 1;
                 if (count) {
                     buttonText.innerText = count + " " + t("second" + (count > 1 ? "s" : ""))
                 } else {
-                    buttonText.innerText = t("Get the code")
+                    buttonText.innerText = t("Resend")
                     openGetCode()
                 }
                 console.log(count)
@@ -134,8 +147,8 @@
 
     function countdown() {
         count = 60;
-        buttonText.innerText = "60 "+ t("seconds");
-        closeGetCode()
+        buttonText.innerText = "60 " + t("seconds");
+        closeGetCode();
         moha();
     }
 
@@ -158,7 +171,7 @@
     function login() {
         loginRolling.style.display = "block";
         closeLogin();
-        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/login/' + code, {
+        fetch('https://flows.thecharityproject.XYZ/webhook/5iZ8kUoaizoRwkJKdV9p/login/' + code, {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -170,16 +183,15 @@
         }).then(function (data) {
             if (data['status']) {
                 window.location.replace("home.html");
-                localStorage.setItem("IsLogin", "true");
+                sessionStorage.setItem("IsLogin", "true");
             } else {
-                console.error('Error:', error);
-                em.innerText = data['message'];
+                em.innerText = t(data['message']);
                 em.style.display = "block";
                 openLogin();
             }
         }).catch(error => {
             console.error('Error:', error);
-            em.innerText = "Sorry, there is a problem with your login attempt.(error type: " + error + ")";
+            em.innerText = t("Sorry, there is a problem with your login attempt.(error type:") + " " + error + ")";
             em.style.display = "block";
             openLogin();
         });
@@ -194,7 +206,9 @@
     }
 
     function sendQuery() {
-        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/login_phone', {
+        getCodeNote.style.display = "block";
+        buttonText.innerText = t("Sending");
+        fetch('https://flows.thecharityproject.XYZ/webhook/5iZ8kUoaizoRwkJKdV9p/login_phone', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -210,16 +224,34 @@
                 em.style.display = "none";
                 countdown();
             } else {
-                em.innerText = data['message'];
+                em.innerText = t(data['message']);
                 em.style.display = "block";
+                buttonText.innerText = t("Resend");
                 openGetCode();
             }
         }).catch(error => {
             codeRolling.style.display = "none";
             console.error('Error:', error);
-            em.innerText = "Sorry, there is a problem with your login attempt.(error type: " + error + ")"
+            em.innerText = t("Sorry, there is a problem with your login attempt.(error type:") + " " + error + ")"
             em.style.display = "block";
+            buttonText.innerText = t("Resend");
             openGetCode();
+        });
+    }
+
+    if ('OTPCredential' in window) {
+        window.addEventListener('DOMContentLoaded', e => {
+            if (!codeInputer) return;
+            const ac = new AbortController();
+            navigator.credentials.get({
+                otp: {transport: ['sms']},
+                signal: ac.signal
+            }).then(otp => {
+                alert(JSON.stringify(otp))
+                codeInputer.value = otp.code;
+            }).catch(err => {
+                console.log(err);
+            });
         });
     }
 </script>

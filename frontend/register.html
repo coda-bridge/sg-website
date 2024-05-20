@@ -7,103 +7,119 @@
     <link href="./dist/css/index.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="media/coda-logo.png">
     <script type="module" src="./component/index.js"></script>
-    <script type="module" src="component/Trans.js"></script>
-    <script type="text/javascript" src="dist/trans.js"></script>
-    <script type="module" src="component/ChangeLanguage.js"></script>
 </head>
 <body class="container">
-<change-language-component></change-language-component>
 <a class="normalButton"
    style="display: flex;align-items:center;margin-top: 1.2rem;margin-left: 0.5rem;border: 1px solid var(--base-green);border-radius: 50%;width: min-content;"
    href="index.html">
     <img style="padding: 0.8rem;" width="22" height="22" src="media/Back.svg" alt="back">
 </a>
-<h1 style="font-size: 1.3rem;font-weight: 600;text-align: center;margin: 1.5rem 0 2rem" class="display-4"><trans-component text="Welcome to"></trans-component>
+<h1 style="font-size: 1.3rem;font-weight: 600;text-align: center;margin: 1.5rem 0 2rem" class="display-4">Welcome to
     <br>
-    <trans-component text="The Charity Project"></trans-component></h1>
-<div id="errorMsg" style="display:none;text-align: center;color: red;">
-    <trans-component text="Sorry, there is a problem with your registration."></trans-component>
-</div>
+    The Charity Project!</h1>
+<div id="errorMsg" style="display:none;text-align: center;color: red;"></div>
 
 <div id="select" style="margin-top: 2rem;" class="form-group">
+</div>
+
+<div class="form-group">
+    <div style="display: flex;margin-top: 1.6rem;justify-content: space-between;">
+        <input style="width: 100%;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.8rem 1rem;"
+               type="text" name="name" id="name" placeholder="Your name">
+    </div>
 </div>
 <div class="form-group">
     <account-component></account-component>
 </div>
-<div class="form-group">
-    <div style="display: flex;margin-top: 1.6rem;justify-content: space-between;">
-        <input style="width: 100%;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.8rem 1rem;"
-               type="text" name="name" id="name">
-    </div>
-</div>
 
 <div style="display: flex;margin-top: 2rem;">
-    <input id="code"
+    <input inputmode="numeric" autocomplete="one-time-code" id="code"
            style="min-width: 0;font-size: 1rem;line-height: 1.5rem;flex: 1;border:1px solid var(--base-green);border-radius: 0.6rem;padding: 0.8rem 1rem;"/>
     <button disabled
             style="white-space:nowrap;margin-left: 1rem;display: flex;align-items: center;border-radius:0.5rem;background-color: #9B9C9C;color: white;font-size: 1.2rem;padding: 0.6rem 1rem;border: 0;"
             id="getCode">
         <img id="code-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
-             src="media/Rolling.svg"/><span id="buttonText">
-        <trans-component text="Get the code"></trans-component>
-    </span>
+             src="media/Rolling.svg"/><span id="buttonText">Get the code</span>
     </button>
 </div>
-
-<div style="display: flex;align-items: center;margin-top: 0.5rem;">
-        <input id="termsOfUseCheck" style="width: 1.2rem; height: 1.2rem;margin-right: 0.4rem;" type="checkbox"/>
-        <div><trans-component text="I have read and agree to the"></trans-component> <a target="_blank" href="terms_of_use.html"><trans-component text="Terms of Use"></trans-component></a></div>
+<div id="getCodeNote" style="display: none;margin-top: 1rem;font-size: 0.8rem;line-height: 1rem;">
+    <div>
+        We sent a verification code to your WhatsApp. Please check your WhatsApp messages and enter the 6-digit code.
+    </div>
+    <div style="margin-top: 0.5rem;">
+        Didn't receive the code? You can request to resend it after one minute.
+    </div>
 </div>
+
+<!--<div id="alart" style="display: none;top: 50%;left: 50%;transform: translate(-50%, -50%);position: absolute;background-color: rgba(0,0,0,0.2);width: 100%;height: 100%;">-->
+<!--    <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);background-color: white;border: 1px solid rgba(0,0,0,0.2);border-radius:0.5rem;">-->
+<!--        <div style="text-align: center;padding: 0.6rem 1rem;">-->
+<!--            <trans-component text="Please read and agree to the "></trans-component>-->
+<!--            <a target="_blank" href="terms_of_use.html">-->
+<!--                <trans-component text="Terms of Use"></trans-component>-->
+<!--            </a>-->
+<!--        </div>-->
+<!--        <button style="font-size: 1rem;cursor: pointer;width: 100%;text-align: center;border:0;border-top: 1px solid rgba(0,0,0,0.2);border-radius:0 0 0.5rem 0.5rem;padding: 0.6rem 0;background-color: white;color: var(&#45;&#45;base-green);font-weight: 699;"-->
+<!--                class="clickButton" id="understandBtn">-->
+<!--            <trans-component text="I agree"></trans-component>-->
+<!--        </button>-->
+<!--    </div>-->
+<!--</div>-->
 
 <div style="width: 100%;display: flex;justify-content: space-between;flex-direction: column;align-items: center;margin-top: 3rem;">
     <button disabled
             style="display: flex;align-items: center;border-radius:0.5rem;background-color: #9B9C9C;color: white;font-size: 1.5rem;padding: 0.6rem 3.5rem;border: 0;"
             type="submit" id="submitBtn">
         <img id="login-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
-             src="media/Rolling.svg"/>
-        <trans-component text="Register"></trans-component>
+             src="media/Rolling.svg"/>Register
     </button>
-    <div id="alertText"
-         style="display: none;text-align: center;margin-top: 2.5rem;font-size: 0.8rem;font-weight: 700">
-    </div>
+<!--    <div style="display: flex;align-items: center;margin-top: 0.5rem;">-->
+<!--        <input id="termsOfUseCheck" style="width: 1.2rem; height: 1.2rem;margin-right: 0.4rem;" type="checkbox"/>-->
+<!--        <div>-->
+<!--            <trans-component text="I have read and agree to the"></trans-component>-->
+<!--            <a target="_blank" href="terms_of_use.html">-->
+<!--                <trans-component text="Terms of Use"></trans-component>-->
+<!--            </a></div>-->
+<!--    </div>-->
 </div>
 <script>
     const submitBtn = document.getElementById('submitBtn');
     const getCode = document.getElementById('getCode');
-    const alertText = document.getElementById('alertText');
     const codeRolling = document.getElementById('code-rolling');
     const loginRolling = document.getElementById('login-rolling');
     const accountInputer = document.querySelector('account-component');
     const nameInputer = document.getElementById('name');
     const codeInputer = document.getElementById('code');
+    const alart = document.getElementById('alart');
+    // const understandBtn = document.getElementById('understandBtn');
     const termsOfUseCheck = document.getElementById('termsOfUseCheck');
+    const getCodeNote = document.getElementById("getCodeNote");
     const em = document.getElementById("errorMsg");
 
-    const resend = document.getElementById('resendBtn');
     const buttonText = document.getElementById('buttonText');
+
+    buttonText.name = "Get the code"
 
     const form = document.getElementById('form');
 
-    window.addEventListener('setLanguage', function (e) {
-        nameInputer.placeholder = t("Your name");
-    });
-
-    nameInputer.placeholder = t("Your name");
-
     let form_json = {}
-    let count = 60;
+    let count = 0;
+    let isSend = false;
     let code = "";
 
-    codeInputer.oninput = (e)=>{
+    codeInputer.oninput = (e) => {
         code = e.target.value;
         checkValidity();
     };
 
-    termsOfUseCheck.onchange = function() {
-        checkValidity();
-    };
+    // termsOfUseCheck.onchange = function () {
+    //     checkValidity();
+    // };
 
     const openGetCode = () => {
+        count = 0;
+        clearTimeout(timerId);
+        buttonText.innerText = "Get the code";
         getCode.style.backgroundColor = 'var(--base-green)';
         getCode.className = 'clickButton';
         getCode.style.cursor = 'pointer';
@@ -118,15 +134,13 @@
         getCode.removeEventListener('click', getCodeFunc);
         getCode.disabled = true
     }
-    
+
     const openRegister = () => {
         submitBtn.style.backgroundColor = 'var(--base-green)';
         submitBtn.className = 'clickButton';
         submitBtn.style.cursor = 'pointer';
         submitBtn.addEventListener('click', register);
         submitBtn.disabled = false;
-        alertText.style.display = "block";
-        alertText.innerHTML = `<trans-component text="Before you create an account, please make sure your phone number is correct."></trans-component>`;
     }
     const closeRegister = () => {
         submitBtn.style.backgroundColor = '#9B9C9C';
@@ -134,13 +148,14 @@
         submitBtn.style.cursor = 'not-allowed';
         submitBtn.removeEventListener('click', register);
         submitBtn.disabled = true;
-        alertText.style.display = "none";
     }
 
     function checkValidity() {
         if (accountInputer.check && nameInputer.value) {
-            openGetCode()
-            if (codeInputer.value && termsOfUseCheck.checked) {
+            if (count === 0) {
+                openGetCode();
+            }
+            if (codeInputer.value) {
                 openRegister();
             } else {
                 closeRegister();
@@ -150,20 +165,21 @@
         }
     }
 
+    let timerId;
+
     function moha() {
         if (count > 0) {
-            setTimeout(() => {
+            timerId = setTimeout(() => {
                 count -= 1;
                 if (count) {
                     buttonText.innerText = count + " second" + (count > 1 ? "s" : "")
                 } else {
                     buttonText.innerText = "Get the code"
-                    resend.style.backgroundColor = 'var(--base-green)';
-                    resend.className = 'clickButton';
-                    resend.style.cursor = 'pointer';
-                    resend.disabled = false;
+                    submitBtn.style.backgroundColor = 'var(--base-green)';
+                    submitBtn.className = 'clickButton';
+                    submitBtn.style.cursor = 'pointer';
+                    submitBtn.disabled = false;
                 }
-                console.log(count)
                 moha(count)
             }, 1000)
         }
@@ -172,10 +188,10 @@
     function countdown() {
         count = 60;
         buttonText.innerText = "60 seconds";
-        resend.style.backgroundColor = '#9B9C9C';
-        resend.className = '';
-        resend.style.cursor = 'not-allowed';
-        resend.disabled = true;
+        submitBtn.style.backgroundColor = '#9B9C9C';
+        submitBtn.className = '';
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.disabled = true;
         moha()
     }
 
@@ -194,34 +210,54 @@
             nameInputer.style.borderColor = "red";
         }
     })
-    
+
+    function setButtonText(name) {
+        buttonText.name = name;
+        buttonText.innerText = name;
+    }
+
     function register() {
-        loginRolling.style.display = "block";
-        closeRegister();
-        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/activate/' + code, {
-            method: 'GET',
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            if (data['status']) {
-                window.location.replace("home.html");
-                localStorage.setItem("IsLogin", "true");
-            } else {
+        // if (termsOfUseCheck.checked) {
+            loginRolling.style.display = "block";
+            closeRegister();
+            fetch('https://flows.thecharityproject.XYZ/webhook/5iZ8kUoaizoRwkJKdV9p/activate/' + code, {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            }).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                loginRolling.style.display = "none";
+                if (data['status']) {
+                    window.location.replace("home.html");
+                    sessionStorage.setItem("IsLogin", "true");
+                } else {
+                    em.type = "status";
+                    em.name = data['message'];
+                    em.innerText = t(data['message']);
+                    em.style.display = "block";
+                    openRegister();
+                }
+            }).catch(error => {
+                loginRolling.style.display = "none";
                 console.error('Error:', error);
-                em.innerText = data['message'];
+                em.type = "fetch";
+                em.name = error;
+                em.innerText = "Sorry, there is a problem with your registration.(error type:" + " " + error + ")";
                 em.style.display = "block";
                 openRegister();
-            }
-        }).catch(error => {
-            console.error('Error:', error);
-            em.innerText = "Sorry, there is a problem with your login attempt.(error type: " + error + ")";
-            em.style.display = "block";
-            openRegister();
-        });
+            });
+        // } else {
+        //     alart.style.display = "block";
+        //     alart.addEventListener("click", ()=>{
+        //         alart.style.display = "none";
+        //     })
+        //     understandBtn.addEventListener("click", () => {
+        //         termsOfUseCheck.checked = true;
+        //     })
+        // }
     }
 
     function getCodeFunc() {
@@ -233,7 +269,7 @@
             form_json.firstname = nameArray.join(" ");
         } else {
             form_json.lastname = "";
-            form_json.firstname = form_json.name;
+            form_json.firstname = nameInputer.value.trim();
         }
         form_json.user_id = 0;
         Object.assign(form_json, accountInputer.value);
@@ -242,15 +278,17 @@
 
 
     function sendQuery() {
+        isSend = true;
         codeRolling.style.display = "block";
-        fetch('https://flows.thecharityproject.XYZ/webhook/mGf4HLHKeePxFzDHk7D1/register', {
+        getCodeNote.style.display = "block";
+        setButtonText("Sending");
+        fetch('https://flows.thecharityproject.XYZ/webhook/5iZ8kUoaizoRwkJKdV9p/register', {
             method: 'POST',
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(form_json),
-
         }).then(function (response) {
             return response.json();
         }).then(function (data) {
@@ -258,21 +296,40 @@
             if (data['status']) {
                 em.innerText = "";
                 em.style.display = "none";
-                document.getElementById("form").style.display = "none";
-                document.getElementById("successMsg").style.display = "block";
                 countdown();
             } else {
+                em.type = "status";
+                em.name = data['message'];
                 em.innerText = data['message'];
                 em.style.display = "block";
+                setButtonText("Resend");
                 openGetCode();
             }
-
         }).catch(error => {
             codeRolling.style.display = "none";
+            setButtonText("Resend");
             console.error('Error:', error);
-            em.innerText = "Sorry, there is a problem with your registration."
+            em.type = "fetch";
+            em.name = error;
+            em.innerText = "Sorry, there is a problem with your registration.(error type:" + " " + error + ")"
             em.style.display = "block";
             openGetCode();
+        });
+        alert("You will receive the verification code on WhatsApp within 60 seconds.");
+    }
+
+    if ('OTPCredential' in window) {
+        window.addEventListener('DOMContentLoaded', e => {
+            if (!codeInputer) return;
+            const ac = new AbortController();
+            navigator.credentials.get({
+                otp: {transport: ['sms']},
+                signal: ac.signal
+            }).then(otp => {
+                codeInputer.value = otp.code;
+            }).catch(err => {
+                console.log(err);
+            });
         });
     }
 </script>

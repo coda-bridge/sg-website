@@ -32,7 +32,7 @@ class Account extends HTMLElement {
     }
 
     render() {
-        this.phoneReg = {1: /^\d{10}$/, 852: /^([6|9])\d{7}$/, 86: /^1\d{10}$/}
+        this.phoneReg = {1: /^\d{10}$/, 65: /^([8|9])\d{7}$/, 86: /^1\d{10}$/}
         this.emailReg = /^[a-zA-Z\d_.-]+@[a-zA-Z\d-]+(\.[a-zA-Z\d-]+)*\.[a-zA-Z\d]{2,6}$/
         this.shadowRoot.innerHTML = `
         <div id="phone" style="margin-top: 2rem" class="form-group">
@@ -57,12 +57,6 @@ class Account extends HTMLElement {
         const phoneCountry = this.shadowRoot.getElementById('phone_country');
         const countrySelector = document.createElement("select-component");
 
-        window.addEventListener('setLanguage', function (e) {
-            phoneNumber.placeholder = t("Phone number");
-        });
-
-        phoneNumber.placeholder = t("Phone number");
-
         const setCountry = (countryCode) => {
             phoneCountry.value = parseInt(countryCode.replace("+", ""));
             let value = phoneNumber.value;
@@ -76,10 +70,10 @@ class Account extends HTMLElement {
             }
         }
 
-        countrySelector.list = ["+1", "+852", "+86"];
+        countrySelector.list = ["+1", "+65", "+86"];
         countrySelector.placeholder = ""
-        phoneCountry.value = 852
-        countrySelector.defaultValue = "+852"
+        phoneCountry.value = 65
+        countrySelector.defaultValue = "+65"
         countrySelector.changeCallBack = setCountry
         phoneNumber.parentNode.insertBefore(countrySelector, phoneNumber);
 
