@@ -15,10 +15,10 @@
     <img style="padding: 0.8rem;" width="22" height="22" src="media/Back.svg" alt="back">
 </a>
 <h3 style="text-align: center;font-weight: 600;margin-bottom: 2rem;">
-    <trans-component text="Welcome back!"></trans-component>
+    Welcome back!
 </h3>
 <div id="errorMsg" style="display:none;text-align: center;color: red">
-    <trans-component text="Sorry, there is a problem with your login attempt."></trans-component>
+    Sorry, there is a problem with your login attempt.
 </div>
 
 <div id="select" style="margin-top: 2rem;" class="form-group">
@@ -35,18 +35,16 @@
         <img id="code-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
              src="media/Rolling.svg"/>
         <span id="buttonText">
-            <trans-component text="Get the code"></trans-component>
+            Get the code
         </span>
     </button>
 </div>
 <div id="getCodeNote" style="display: none;margin-top: 1rem;font-size: 0.8rem;line-height: 1rem;">
     <div>
-        <trans-component
-                text="We sent a verification code to your WhatsApp. Please check your WhatsApp messages and enter the 6-digit code."></trans-component>
+        We sent a verification code to your WhatsApp. Please check your WhatsApp messages and enter the 6-digit code.
     </div>
     <div style="margin-top: 0.5rem;">
-        <trans-component
-                text="Didn't receive the code? You can request to resend it after one minute."></trans-component>
+        Didn't receive the code? You can request to resend it after one minute.
     </div>
 </div>
 <div style="width: 100%;display: flex;justify-content: center;margin-top: 4rem">
@@ -55,7 +53,7 @@
             id="submitBtn">
         <img id="login-rolling" style="display:none;width: 1.5rem;height: 1.5rem;margin-right: 0.5rem"
              src="media/Rolling.svg"/>
-        <trans-component text="Log in"></trans-component>
+        Log in
     </button>
 </div>
 <script>
@@ -134,9 +132,9 @@
             timerId = setTimeout(() => {
                 count -= 1;
                 if (count) {
-                    buttonText.innerText = count + " " + t("second" + (count > 1 ? "s" : ""))
+                    buttonText.innerText = count + " " + "second" + (count > 1 ? "s" : "")
                 } else {
-                    buttonText.innerText = t("Resend")
+                    buttonText.innerText = "Resend"
                     openGetCode()
                 }
                 console.log(count)
@@ -147,7 +145,7 @@
 
     function countdown() {
         count = 60;
-        buttonText.innerText = "60 " + t("seconds");
+        buttonText.innerText = "60 seconds";
         closeGetCode();
         moha();
     }
@@ -185,13 +183,13 @@
                 window.location.replace("home.html");
                 sessionStorage.setItem("IsLogin", "true");
             } else {
-                em.innerText = t(data['message']);
+                em.innerText = data['message'];
                 em.style.display = "block";
                 openLogin();
             }
         }).catch(error => {
             console.error('Error:', error);
-            em.innerText = t("Sorry, there is a problem with your login attempt.(error type:") + " " + error + ")";
+            em.innerText = "Sorry, there is a problem with your login attempt.(error type:" + " " + error + ")";
             em.style.display = "block";
             openLogin();
         });
@@ -207,7 +205,7 @@
 
     function sendQuery() {
         getCodeNote.style.display = "block";
-        buttonText.innerText = t("Sending");
+        buttonText.innerText = "Sending";
         fetch('https://flows.thecharityproject.XYZ/webhook/5iZ8kUoaizoRwkJKdV9p/login_phone', {
             method: 'POST',
             credentials: "include",
@@ -224,17 +222,17 @@
                 em.style.display = "none";
                 countdown();
             } else {
-                em.innerText = t(data['message']);
+                em.innerText = data['message'];
                 em.style.display = "block";
-                buttonText.innerText = t("Resend");
+                buttonText.innerText = "Resend";
                 openGetCode();
             }
         }).catch(error => {
             codeRolling.style.display = "none";
             console.error('Error:', error);
-            em.innerText = t("Sorry, there is a problem with your login attempt.(error type:") + " " + error + ")"
+            em.innerText = "Sorry, there is a problem with your login attempt.(error type:" + " " + error + ")"
             em.style.display = "block";
-            buttonText.innerText = t("Resend");
+            buttonText.innerText = "Resend";
             openGetCode();
         });
     }
