@@ -8,7 +8,7 @@
     <script type="module" src="component/CollapseLabel.js"></script>
     <link rel="icon" type="image/png" href="media/coda-logo.png">
     <script>
-        if (localStorage.getItem("IsLogin") !== "true") {
+        if (sessionStorage.getItem("IsLogin") !== "true") {
             location.replace("index.html")
         }
     </script>
