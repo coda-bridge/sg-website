@@ -38,7 +38,7 @@ class Selector extends HTMLElement {
                 ${this.placeholder || ""}
             </div>
             <input style="display: none;line-height:1.5rem;" name="role" id="role">
-            <img width="20" height="20" src="https://www.thecharityproject.xyz/media/Selector.svg"/>
+            <img width="20" height="20" src="/media/Selector.svg"/>
         </div>
         <div id="selectOptionList"
              style="z-index: 50;position:absolute;display: none;background-color: white;border-radius:0 0 0.6rem 0.6rem;">
@@ -60,6 +60,36 @@ class Selector extends HTMLElement {
             composed: true
         }));
 
+        function transDate(dateText, locales) {
+            const fixData = parseInt(dateText) * Math.pow(10, 13 - dateText.toString().length)
+            const month = new Date(fixData).toLocaleString(locales, {month: 'short'});
+            const year = new Date(fixData).getFullYear();
+            return month + " " + year;
+        }
+
+
+        function transText(e) {
+            selectOptionList.querySelectorAll("div").forEach(item => {
+                if (that.type === "time") {
+                    if (item.id === roleInput.value) {
+                        select.innerText = transDate(item.name, "en-US");
+                    }
+                    item.innerText = transDate(item.name, "en-US");
+                } else {
+                    if (item.id === roleInput.value) {
+                        select.innerText = item.name;
+                    }
+                    item.innerText = item.name;
+                }
+            })
+        }
+
+        function getFirstDayOfMonthTimestamp() {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            return firstDay.setHours(0, 0, 0, 0);
+        }
+
         if (this.list) {
             this.list.forEach(value => {
                 const valueItem = document.createElement('div');
@@ -80,11 +110,21 @@ class Selector extends HTMLElement {
                 }
                 selectOptionList.appendChild(valueItem)
                 if (this.defaultValue) {
+                    if (that.type === "time") {
+                        const nowTime = new Date(getFirstDayOfMonthTimestamp())
+                        const language = sessionStorage.getItem("codaLanguage")
+                        this.defaultValue = {name: transDate(nowTime.getTime(), "en-US" ), value: nowTime.getTime()};
+                    }
                     setValue(this.defaultValue)
                 }
             })
+            transText();
             syncWidth();
         }
+
+        window.addEventListener('setLanguage', (e) => {
+            transText(e)
+        });
 
         if (!this.type || this.type === "normal") {
             roleSelect.className = "normal-body"
@@ -134,17 +174,19 @@ class Selector extends HTMLElement {
         })
 
         function setValue(value) {
+            let thisCheckValue
             select.style.color = "black"
             if (typeof value === "string") {
                 select.innerText = value
-                roleInput.value = value
-            }else {
+                thisCheckValue = value
+            } else {
                 select.innerText = value.name
-                roleInput.value = value.value
+                thisCheckValue = value.value
             }
+            roleInput.value = thisCheckValue
             const divs = selectOptionList.querySelectorAll('div');
             divs.forEach(div => {
-                if (div.id !== value) {
+                if (div.id !== thisCheckValue) {
                     div.style.backgroundColor = "white";
                 } else {
                     div.style.backgroundColor = "rgba(73,176,93,0.5)";
