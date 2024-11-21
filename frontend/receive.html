@@ -8,9 +8,9 @@
     <link rel="icon" type="image/png" href="media/coda-logo.png">
     <script type="text/javascript" src="dist/zxing.min.js"></script>
     <script>
-        // if (sessionStorage.getItem("IsLogin") !== "true") {
-        //     location.replace("index.html")
-        // }
+        if (sessionStorage.getItem("IsLogin") !== "true") {
+            location.replace("index.html")
+        }
     </script>
 </head>
 <body>
@@ -191,10 +191,7 @@
 
     document.getElementById("open-edit").addEventListener("click", openEdit)
 
-    generateQRCode()
     function generateQRCode() {
-        kitchenName="Dignity Kitchen"
-        ethAddress="0xD56084bc80cCb5A8CcE884Bb61f984BE0530EE93"
         const amount = amountInput.value
         document.getElementById("result").innerHTML = ""
         if (amount && amount !== "0.00") {
