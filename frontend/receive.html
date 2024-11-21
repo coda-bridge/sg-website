@@ -8,9 +8,9 @@
     <link rel="icon" type="image/png" href="media/coda-logo.png">
     <script type="text/javascript" src="dist/zxing.min.js"></script>
     <script>
-        if (sessionStorage.getItem("IsLogin") !== "true") {
-            location.replace("index.html")
-        }
+        // if (sessionStorage.getItem("IsLogin") !== "true") {
+        //     location.replace("index.html")
+        // }
     </script>
 </head>
 <body>
@@ -191,14 +191,17 @@
 
     document.getElementById("open-edit").addEventListener("click", openEdit)
 
+    generateQRCode()
     function generateQRCode() {
+        kitchenName="Dignity Kitchen"
+        ethAddress="0xD56084bc80cCb5A8CcE884Bb61f984BE0530EE93"
         const amount = amountInput.value
         document.getElementById("result").innerHTML = ""
         if (amount && amount !== "0.00") {
             document.getElementById("result").innerHTML = `<div style="font-size: 4rem;color: var(--base-green);font-weight: 700;text-align: center;">$${amount}</div>`
         }
         const codeWriter = new ZXing.BrowserQRCodeSvgWriter()
-        codeWriter.writeToDom('#result', encodeURI(`/pay.html?name=${kitchenName}&ethAddress=${ethAddress}&amount=${amount}`), 300, 300);
+        codeWriter.writeToDom('#result', encodeURI(`https://sg.thecharityproject.xyz/pay.html?name=${kitchenName}&ethAddress=${ethAddress}&amount=${amount}`), 300, 300);
     }
 
     const getTransaction = async () => {
